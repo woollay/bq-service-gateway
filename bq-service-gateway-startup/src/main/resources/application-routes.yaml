@@ -1,0 +1,96 @@
+spring:
+  cloud:
+    gateway:
+      enabled: true
+      metrics:
+        # 开启 GatewayMetricsFilter
+        enabled: true
+      discovery:
+        locator:
+          #开启从注册中心动态生成路由的功能，用微服务名进行路由
+          enabled: true
+          lowerCaseServiceId: true
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY
+            #10M
+            maxSize: 10485760
+#      routes:
+#        - id: auth_route
+#          uri: lb://bq-auth/
+#          order: 1
+#          predicates:
+#            - Path=/oauth/**,/auth/**,/bq-auth/monitor/**
+#          #为接口设置熔断过滤器
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: circuitBreaker
+#                fallbackUri: forward:/fallback
+#        - id: demo_auth
+#          uri: lb://bq-demo/
+#          order: 1
+#          predicates:
+#            - Path=/bq-demo/demo/**,/bq-demo/monitor/**,/demo/**
+#          #为接口设置熔断过滤器
+#          filters:
+#            - name: CircuitBreaker
+#              args:
+#                name: circuitBreaker
+#                fallbackUri: forward:/fallback
+#        - id: eureka_route
+#          uri: http://bq-eureka/
+#          order: 1
+#          predicates:
+#            - Path=/eureka/**,/bq-eureka/monitor/**
+#        #专为熔断设置的url
+#        - id: fallback_route
+#          uri: http://localhost:${server.port}
+#          predicates:
+#            - Path=/fallback
+bq:
+  cloud:
+    gateway:
+      security:
+        #外部调进来的接口免鉴权白名单
+        whitelist:
+          - /bq-auth/monitor/**
+          - /bq-auth/bq-auth/monitor/**
+          - /bq-demo/bq-demo/monitor/**
+          - /bq-demo/monitor/**
+          - /bq-eureka/monitor/**
+          - /eureka/**
+          - /fallback
+        # 认证接口解密
+        auth:
+          url: /oauth/enc/token
+          dec: GM
+          redirect: ${bq.channels.jwt.url}
+          enc: ''
+        #防篡改校验
+        verify:
+          enabled: true
+          urls:
+            - /demo/enc/qr
+            - /demo/enc2/qr
+            - /demo/qr
+            - /oauth/token
+            - /oauth/enc/token
+        encrypts:
+          - url: /demo/enc/qr
+            dec: GM
+            redirect: /demo/qr
+            enc: GM
+          #验签/加密/不解密
+          - url: /demo/enc2/qr
+            dec: ''
+            redirect: /demo/qr
+            enc: GM
+          #不验签/不加密/解密
+          - url: /demo/enc3/qr
+            dec: GM
+            redirect: /demo/qr
+            enc: ''
+

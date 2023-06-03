@@ -1,0 +1,62 @@
+spring:
+  profiles:
+    active: root,nacos,circuitbreaker,routes
+  application:
+    name: bq-gateway
+  codec:
+    #10M
+    max-in-memory-size: 10485760
+    log-request-details: true
+logging:
+  level:
+    ROOT: INFO
+server:
+  port: 9992
+  max-http-header-size: 5MB
+react:
+  netty:
+    work-count: 20
+feign:
+  httpclient:
+    enabled: true
+  okhttp:
+    enabled: false
+bq:
+  http:
+    rest:
+      id: defaultRest
+      #连接超时时间
+      connTimeout: 1000
+      #请求超时时间
+      timeout: 3000
+      #关闭socket之后延迟关闭http通道的时间(ms)
+      soLinger: 1000
+      maxConn: 1000
+    clients:
+      - id: defaultHttp
+        connTimeout: 1000
+        timeout: 3000
+      - id: initHttp
+        connTimeout: 1000
+        timeout: 2000
+      - id: gatewayHttp
+        connTimeout: 3000
+        timeout: 10000
+        #关闭socket之后延迟关闭http通道的时间(ms)
+        soLinger: 3000
+        maxConn: 2000
+  channels:
+    jwt:
+      serviceId: 6e3c6f31b6894254ae0cd887deaf3318
+      pubKey: ENC([key]8081087ac1de563412284b64cca3bc12c053d86686dc242dfb31c168d899832e28bab3bd46ab9aa83814f149e08a4e2c2222ba3f1600cca3bafec9770bf22286ad6f12b68eadf47de101b5518260bbff74c3988743b2ffeba3711f631e8a9eeb33bc76e3e4dbc35ddfa58b9e1e77375406945a42788683187a2fe78fafa70dfcdb6041e34b48eadafdba21bddcfa8ca308d52f61377d91155edf3d2987c6a2ad92a7bde6f864d09b8cc8792e828eb5e51c3c4cfff8a73ed052accfa9c2c93067b0bf772f0a0e583f063adf226e133453e3d0564edc7c7c67357ab176af84f17dc5190ac21a5c0f9eda577f6f3d7110a5ba8d181ba924e3e83f783c9da638c79fda4691132df08656cb3a51e322672bbfa847bed0a9886f47fc71b129d73dc781ec458acc7e032411297a8983b01a5908f4149b370b4949fbbc8f8053fa53986e96977daeb5d6b6359d802025bf41a238a7861b8a07e204704d21d552dfec1022c14922ffca869a38301216276804832da1b431e29bc661045538231debf3e44f978b8b302176a2971cc04fde6d90de56a6cbe8f9abf6ca0b1f5b14b528d5449abbc92ba572b54c6d42d611243ef9e637d06b9f22b79ffffb6d66c2db2522cd9b1fe590b3d13b1970252f39453afb251e310980c92e201e0b61f240382610878cdd737bdbb97e57bba7f168518895646ebdb1ae5ecc64efd9bbcd2730aa732f00e4a23ea7134105928379bf07518dc96f767badbdb010951aafffad10741d2829cc17aad8d88241174bfb074bda873dd4baf3197a450d23348d401b17362882d75534e8c5c5265dfc20516d792c903e675637a1f748ebcc9fc4cbb8b8)
+      #jwt访问地址
+      url: /oauth/token
+      #jwk访问地址
+      authUrl: http://bq-auth/oauth/jwk
+
+
+
+
+
+
+

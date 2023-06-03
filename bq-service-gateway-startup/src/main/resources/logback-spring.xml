@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: FATAL > ERROR > WARN > INFO > DEBUG-->
+<configuration debug="false">
+    <springProperty scope="context" name="LOG_SERVICE" source="spring.application.name" defaultValue="bq-service"/>
+    <!--    <springProperty scope="context" name="LOG_PATH" source="logging.basedir" defaultValue="/temp/${LOG_SERVICE}"/>-->
+    <springProperty scope="context" name="INSTANCE_ID" source="server.port" defaultValue="8080"/>
+    <springProperty scope="context" name="BASE_LOG_PATH" source="logging.basedir" defaultValue="/temp/${LOG_SERVICE}"/>
+
+    <!-- 日志默认输出级别 -->
+    <springProperty scope="context" name="LOG_LEVEL" source="log.level.ROOT" defaultValue="INFO"/>
+    <!-- 日志文件默认输出格式,不带行号输出(行号显示会影响日志输出性能);%C:大写,类名;%M:方法名;%m:错误信息;%n:换行 -->
+    <!--%d{yy-MM-dd HH:mm:ss.SSS}[TxId:%X{PtxId},SpanId:%X{PspanId}][${LOG_SERVICE}][%level][%logger{20}_%M] - %msg%n-->
+    <springProperty scope="context" name="LOG_PATTERN" source="logging.format" defaultValue="%msg%n"/>
+    <springProperty scope="context" name="ACCESS_LOG_PATTERN" source="logging.access" defaultValue="%msg%n"/>
+    <!-- 审计日志文件默认输出格式,不带行号输出(行号显示会影响日志输出性能);%C:大写,类名;%M:方法名;%m:错误信息;%n:换行 -->
+    <springProperty scope="context" name="AUDIT_LOG_PATTERN" source="logging.simple-format" defaultValue="%m%n"/>
+    <!-- 日志默认切割的最小单位 -->
+    <springProperty scope="context" name="MAX_FILE_SIZE" source="logging.file-size" defaultValue="100MB"/>
+    <!--单机直接运行时这样区分-->
+    <property name="LOG_PATH" value="${BASE_LOG_PATH}/${LOG_SERVICE}_${INSTANCE_ID}"/>
+
+    <!--控制台日志-->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!--spring-cloud-gateway access log-->
+    <appender name="accessLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/access.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/%d{yy-MM-dd}/access-%d{yy-MM-dd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${AUDIT_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <appender name="asyncAccessLog" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="accessLog"/>
+    </appender>
+
+    <!--default日志 -->
+    <appender name="defaultAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/default.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/%d{yy-MM-dd}/default-%d{yy-MM-dd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <appender name="asyncNettyLog" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="defaultAppender"/>
+    </appender>
+
+    <!--error日志 -->
+    <appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/%d{yy-MM-dd}/error-%d{yy-MM-dd}.log</FileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--gateway access-log, with jvm env:'-Dreactor.netty.http.server.accessLogEnabled=true'-->
+    <logger name="reactor.netty.http.server.AccessLog" level="INFO" additivity="false">
+        <appender-ref ref="asyncAccessLog"/>
+    </logger>
+    <!--记录netty日志-->
+    <logger name="reactor.netty.http.server.HttpServer" level="DEBUG" additivity="false" includeLocation="true">
+        <appender-ref ref="asyncNettyLog"/>
+    </logger>
+
+    <!--默认日志-->
+    <logger name="com.biuqu" additivity="false">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="defaultAppender"/>
+    </logger>
+
+    <!--全局异常日志-->
+    <logger name="com.biuqu.boot.service.gateway.handler.GlobalExceptionHandler" additivity="false">
+        <appender-ref ref="defaultAppender"/>
+        <appender-ref ref="errorAppender"/>
+    </logger>
+
+    <!--建立一个默认的root的logger -->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="defaultAppender"/>
+    </root>
+</configuration>
