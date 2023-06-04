@@ -29,11 +29,11 @@ spring:
 #              args:
 #                name: circuitBreaker
 #                fallbackUri: forward:/fallback
-#        - id: demo_auth
-#          uri: lb://bq-demo/
+#        - id: biz_auth
+#          uri: lb://bq-biz/
 #          order: 1
 #          predicates:
-#            - Path=/bq-demo/demo/**,/bq-demo/monitor/**,/demo/**
+#            - Path=/bq-biz/demo/**,/bq-biz/monitor/**,/demo/**
 #          #为接口设置熔断过滤器
 #          filters:
 #            - name: CircuitBreaker
