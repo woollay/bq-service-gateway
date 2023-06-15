@@ -18,6 +18,7 @@
         <dependency>
             <groupId>com.biuqu</groupId>
             <artifactId>bq-boot-root</artifactId>
+            <version>1.0.4</version>
         </dependency>
 
         <!--spring-cloud-->

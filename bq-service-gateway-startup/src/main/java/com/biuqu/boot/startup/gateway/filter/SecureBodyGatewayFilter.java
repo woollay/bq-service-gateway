@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * 安全过滤器(支持参数摘要校验和报文内容加解密)
+ * 安全过滤器(支持报文内容加解密)
  *
  * @author BiuQu
  * @date 2023/3/10 09:26

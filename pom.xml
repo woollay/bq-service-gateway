@@ -36,7 +36,7 @@
             <dependency>
                 <groupId>com.biuqu</groupId>
                 <artifactId>bq-boot-root</artifactId>
-                <version>${bq.version}</version>
+                <version>1.0.4</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework</groupId>
