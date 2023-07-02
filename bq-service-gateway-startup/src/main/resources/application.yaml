@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: root,nacos,circuitbreaker,routes
+    active: root,nacos,routes
   application:
     name: bq-gateway
   codec:

@@ -96,6 +96,7 @@
     <!--全局异常日志-->
     <logger name="com.biuqu.boot.service.gateway.handler.GlobalExceptionHandler" additivity="false">
         <appender-ref ref="defaultAppender"/>
+        <appender-ref ref="consoleAppender"/>
         <appender-ref ref="errorAppender"/>
     </logger>
 

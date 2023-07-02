@@ -1,0 +1,32 @@
+[
+  {
+    "id": "auth-route",
+    "uri": "lb://bq-auth/",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern1": "/oauth/**",
+          "pattern2": "/auth/**",
+          "pattern3": "/bq-auth/monitor/**"
+        }
+      }
+    ]
+  },
+  {
+    "id": "biz_route",
+    "uri": "lb://bq-biz/",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern1": "/bq-biz/demo/**",
+          "pattern2": "/bq-biz/monitor/**",
+          "pattern3": "/demo/**"
+        }
+      }
+    ]
+  }
+]

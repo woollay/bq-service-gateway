@@ -1,6 +1,13 @@
 spring:
   cloud:
     sentinel:
+      #      #配置限流之后，响应内容
+      #      scg:
+      #        fallback:
+      #          ## 两种模式，一种是response返回文字提示信息，一种是redirect，重定向跳转，需要同时配置redirect(跳转的uri)
+      #          mode: redirect
+      #          ## 跳转的URL依旧是rest json
+      #          redirect: http://localhost:9992/fallback
       transport:
         #sentinel服务地址
         dashboard: localhost:8080

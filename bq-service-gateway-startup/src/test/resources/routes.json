@@ -1,0 +1,68 @@
+[
+  {
+    "id": "auth-route",
+    "uri": "lb://bq-auth/",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern1": "/oauth/**",
+          "pattern2": "/auth/**",
+          "pattern3": "/bq-auth/monitor/**"
+        }
+      }
+    ],
+    "filters": [
+      {
+        "name": "CircuitBreaker",
+        "args": {
+          "name": "circuitBreaker",
+          "fallbackUri": "forward:/fallback"
+        }
+      }
+    ]
+  },
+  {
+    "id": "biz_route",
+    "uri": "lb://bq-biz/",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern1": "/bq-biz/demo/**",
+          "pattern2": "/bq-biz/monitor/**",
+          "pattern3": "/demo/**"
+        }
+      }
+    ]
+  },
+  {
+    "id": "fallback_route",
+    "uri": "http://localhost:9992",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern": "/fallback"
+        }
+      }
+    ]
+  },
+  {
+    "id": "test_route",
+    "uri": "lb://bq-test/",
+    "order": 1,
+    "predicates": [
+      {
+        "name": "Path",
+        "args": {
+          "pattern1": "/test/**",
+          "pattern2": "/bq-test/monitor/**"
+        }
+      }
+    ]
+  }
+]
